@@ -1,0 +1,42 @@
+version: '3'
+services:
+  web:
+    hostname: goodbytes.local  
+    build:
+      context: .
+      dockerfile: .docker/web.dockerfile
+    
+    image: goodbytes.local
+
+    ports:
+        -  8088:80
+    
+    volumes:
+      - ./lsapp:/app
+    
+    depends_on:
+      - db
+    
+    links:
+      - db
+  
+  db:
+    image: datajoint/mysql
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=simple
+    volumes:
+      - ./data:/var/lib/mysql
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+            PMA_ARBITRARY: 1
+            MYSQL_USER: root
+            MYSQL_PASSWORD: simple
+            MYSQL_ROOT_PASSWORD: simple
+    ports:
+            - "80:80"
+    links:
+            # for mysql container
+            - "db:db"
